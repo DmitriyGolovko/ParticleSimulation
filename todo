@@ -1,0 +1,10 @@
+This is going to be another somewhat ambitious project.
+The premise is a particle simulation.
+With 3 forces: Gravity, Magnetic, and Electric
+
+The goal is to study how a rotating system of charged particles creates a magnetic field.
+
+Some questions to ask:
+-Do the charges of the particles affect the final shape of a settled system of particles?
+-How does the rotation of the shape affect its motion/shape?
+-How far can a simulation be pushed on a web browser?
