@@ -8,3 +8,8 @@ Some questions to ask:
 -Do the charges of the particles affect the final shape of a settled system of particles?
 -How does the rotation of the shape affect its motion/shape?
 -How far can a simulation be pushed on a web browser?
+
+
+Design:
+-Dedicated workers for parallel processing.
+-Post processing effects for better visuals.
