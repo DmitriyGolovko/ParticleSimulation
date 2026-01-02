@@ -9,7 +9,51 @@ Some questions to ask:
 -How does the rotation of the shape affect its motion/shape?
 -How far can a simulation be pushed on a web browser?
 
-
+---------------------------------
 Design:
+
+Features:
 -Dedicated workers for parallel processing.
 -Post processing effects for better visuals.
+
+UI Parameters:
+-Pause/play
+-Simulation speed slider
+
+-Brush on/off
+-Brush size
+-Brush shape
+
+-Particle initial velocities
+-Particle masses distribution
+-Particle charge distribution
+
+-Selection delete
+
+-Gravity strength
+
+
+-------------------------------------
+ToDo
+A basic outline of the steps required to complete the proejct.
+These steps could change depending on what is discovered during research.
+
+1. Design basic UI to accomodate parameters.
+
+
+2. Create the server for handling requests.
+
+
+3. Implement basic 3D graphics for particles.
+
+
+4. Plan implementation of physics equations - long term.
+
+
+5. Implement particle simulation physics with gravity and electric force (instantaneous forces).
+
+
+6. Multithread the simulation using dedicated workers.
+
+
+7. Simulate using delayed forces accounting for speed of light of information relay.
