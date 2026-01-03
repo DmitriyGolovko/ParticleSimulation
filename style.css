@@ -20,7 +20,6 @@ body {
     left: 0;
     padding: 8px;
     width: 100vw;
-    height: 50px;
     display: flex;
     justify-content: space-between;
 }
@@ -32,8 +31,22 @@ body {
 }
 
 .right-options-container {
-    margin-right: 18px;
     height: 100%;
     display: flex;
     justify-content: space-between;
+}
+
+.button, .slider {
+    height: 30px;
+    margin-right: 16px;
+}
+
+.button {
+    width: 30px;
+    background-color: red;
+}
+
+.slider {
+    width: 150px;
+    background-color: red;
 }
