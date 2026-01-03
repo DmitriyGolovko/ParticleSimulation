@@ -1,0 +1,39 @@
+* {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+}
+
+.main-container {
+    margin: 0;
+    background-color: black;
+    width: 100vw;
+    height: 100vh;
+}
+
+.ui-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 8px;
+    width: 100vw;
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.left-options-container {
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.right-options-container {
+    margin-right: 18px;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+}

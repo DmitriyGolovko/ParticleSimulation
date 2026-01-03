@@ -20,22 +20,25 @@ UI Parameters:
 -Pause/play
 -Simulation speed slider
 
+-Selection delete
+
 -Brush on/off
 -Brush size
 -Brush shape
 
+(Brush parameters window)
 -Particle initial velocities
 -Particle masses distribution
 -Particle charge distribution
 
--Selection delete
-
 -Gravity strength
+
+-Help info window
 
 
 -------------------------------------
 ToDo
-A basic outline of the steps required to complete the proejct.
+A basic outline of the steps required to complete the project.
 These steps could change depending on what is discovered during research.
 
 1. Design basic UI to accomodate parameters.
