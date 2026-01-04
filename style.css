@@ -1,4 +1,5 @@
 * {
+    color: white;
     font-family: 'Courier New', Courier, monospace;
 }
 
@@ -36,13 +37,19 @@ body {
     justify-content: space-between;
 }
 
-.button, .slider {
-    height: 30px;
+
+
+.button, .slider, .value {
+    height: 25px;
     margin-right: 16px;
+    border-radius: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .button {
-    width: 30px;
+    width: 25px;
     background-color: red;
 }
 
