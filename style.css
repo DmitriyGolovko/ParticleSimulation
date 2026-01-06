@@ -53,7 +53,15 @@ body {
     background-color: red;
 }
 
+.button:hover {
+    cursor: pointer;
+}
+
 .slider {
     width: 150px;
     background-color: red;
+}
+
+input[type="range"]:hover {
+    cursor: pointer;
 }
