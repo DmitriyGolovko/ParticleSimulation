@@ -37,6 +37,8 @@ function resize() {
 
 //#region Associated Button Functions
 
+
+//Play button event.
 playButtonElement = document.querySelector('.play-button');
 playButtonElement.addEventListener('click', playButtonToggle);
 
@@ -45,6 +47,7 @@ function playButtonToggle() {
 }
 
 
+//Speed slider event.
 speedSlider = document.getElementById('id-simulation-speed-slider');
 speedSlider.addEventListener('input', speedSliderAdjust);
 
@@ -59,20 +62,45 @@ function speedSliderAdjust() {
     speedValueDisplay.innerHTML = `x${speedValue}${Number.isInteger(speedValue) ? '.0' : ''}`;
 }
 
-function selectionDeleteToggle() {
 
+//Selection delete button event.
+deleteButton = document.querySelector('.delete-button');
+deleteButton.addEventListener('click', selectionDeleteToggle);
+
+function selectionDeleteToggle() {
+    isDeleting = !isDeleting;
 }
+
+
+//Toggle brush button event.
+brushButton = document.querySelector('.brush-button');
+brushButton.addEventListener('click', brushToggle);
 
 function brushToggle() {
-
+    isBrush = !isBrush;
 }
+
+
+//Brush slider adjust event.
+brushSlider = document.getElementById('id-brush-size-slider');
+brushSlider.addEventListener('input', brushSizeAdjust);
 
 function brushSizeAdjust() {
-
+    brushSize = parseFloat(brushSlider.value);
 }
 
-function brushShapeToggle() {
 
+//Toggling brush shape event. Cube/sphere brush.
+cubeBrushButton = document.querySelector('.cube-brush-button');
+cubeBrushButton.addEventListener('click', brushShapeToggle);
+
+sphereBrushButton = document.querySelector('.sphere-brush-button');
+sphereBrushButton.addEventListener('click', brushShapeToggle);
+
+
+
+function brushShapeToggle() {
+    isBrushSphere = !isBrushSphere;
 }
 
 function brushParametersPressed() {
