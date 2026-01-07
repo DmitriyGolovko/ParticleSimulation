@@ -43,10 +43,12 @@ A basic outline of the steps required to complete the project.
 These steps could change depending on what is discovered during research.
 
 1. Design basic UI to accomodate parameters.
-
+-Created basic functionality of buttons. Will beautify later.
+-Will create windows for parameters and help later.
 
 2. Create the server for handling requests.
-
+-Copied the central server setup.
+-Will make it harder to work on multiple stations but may not need to the next 20 days.
 
 3. Implement basic 3D graphics for particles.
 

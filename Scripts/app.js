@@ -6,7 +6,13 @@
 
 //Getting canvas and webgl contexts.
 const canvas = document.getElementById('graphics-canvas');
-const gl = canvas.getContext('webgl');
+const gl = canvas.getContext('webgl', {
+    alpha: true
+});
+
+//Width and height of window. Set in resize() event.
+width;
+height;
 
 //Left associated UI variables.
 let isPlaying = true;
@@ -29,8 +35,10 @@ resize(); //Resize on load.
 window.onresize = resize;
 
 function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
 }
 
 //#endregion
