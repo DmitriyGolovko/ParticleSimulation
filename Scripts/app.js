@@ -4,12 +4,6 @@
 
 //#region Global Parameters
 
-//Getting canvas and webgl contexts.
-const canvas = document.getElementById('graphics-canvas');
-const gl = canvas.getContext('webgl', {
-    alpha: true
-});
-
 //Width and height of window. Set in resize() event.
 width;
 height;
