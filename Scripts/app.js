@@ -5,8 +5,8 @@
 //#region Global Parameters
 
 //Width and height of window. Set in resize() event.
-width;
-height;
+let width;
+let height;
 
 //Left associated UI variables.
 let isPlaying = true;
