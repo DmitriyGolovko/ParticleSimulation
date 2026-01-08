@@ -59,41 +59,36 @@ function createShader(shaderSource, shaderType) {
 }
 
 /*
-Send an HTTP GET request to URL asynchronously to fetch files.
+Attach vertex and fragment shader to existing program.
+Displays any errors with linking.
+vertexFile, fragmentFile reference the fullname of a the file in /Shaders directory
 */
-async function getFile(url) {
-    await fetch()
+async function programShaders(program, vertexFile, fragmentFile) {
+    vertexShaderSource = await fetch(shaderURL + vertexFile);
+    vertexShader = createShader(vertexShaderSource, 'vertex');
+
+    fragmentShaderSource = await fetch(shaderURL + fragmentFile);
+    fragmentShader = createShader(fragmentShaderSource, 'fragment');
+
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        throw new Error(gl.getProgramInfoLog(program));
+    }
 }
-
-
+    
 /*
-Initializes entire program.
+Initializes programs.
 Asynchronous to fetch shader source code from server.
 */
 async function initializeProgram() {
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
-    vertexShaderSource = await fetch(shaderURL + '3d.vs');
-    if (vertexShaderSource) {
-        vertexShader = createShader(vertexShaderSource, 'vertex');
-    }
-
-    fragmentShaderSource = await fetch(shaderURL + '3d.fs');
-    if (fragmentShaderSource) {
-        fragmentShader = createShader(fragmentShaderSource, 'fragment');
-    }
-
-    gl.attachShader(renderProgram, vertexShader);
-    gl.attachShader(renderProgram, fragmentShader);
-
-    gl.linkProgram(renderProgram);
-    if (!gl.getProgramParameter(renderProgram, gl.LINK_STATUS)) {
-        throw new Error(gl.getProgramInfoLog(program));
-    }
-
-
-    quadVertexShaderSource = await fetch(shaderURL + 'quad.vs');
-    passFragmentShaderSource = await fetch(shaderURL + 'pass.fs');
+    //Attach shaders for 3d rendering and passthrough programs.
+    programShaders(renderProgram, '3d.vs', '3d.fs');
+    programShaders(passProgram, 'quad.vs', 'pass.fs');
 }
 
 //#endregion

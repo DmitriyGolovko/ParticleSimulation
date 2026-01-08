@@ -1,3 +1,14 @@
+
+
+---------------TASKS-------------
+-Add error handling for programShaders
+
+
+
+
+
+----------------GOAL-----------------
+
 This is going to be another somewhat ambitious project.
 The premise is a particle simulation.
 With 3 forces: Gravity, Magnetic, and Electric
@@ -9,8 +20,7 @@ Some questions to ask:
 -How does the rotation of the shape affect its motion/shape?
 -How far can a simulation be pushed on a web browser?
 
----------------------------------
-Design:
+--------------Design---------------
 
 Features:
 -Dedicated workers for parallel processing.
@@ -37,7 +47,7 @@ UI Parameters:
 -Help info window
 
 
--------------------------------------
+-------------MAIN OUTLINE------------------
 ToDo
 A basic outline of the steps required to complete the project.
 These steps could change depending on what is discovered during research.
