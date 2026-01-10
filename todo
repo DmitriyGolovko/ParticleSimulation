@@ -1,8 +1,8 @@
 
 
 ---------------TASKS-------------
--Add error handling for programShaders
-
+-Add error handling for programShaders. DONE
+-Adjust opengl window on resize. DONE
 
 
 
@@ -45,6 +45,9 @@ UI Parameters:
 -Gravity strength
 
 -Help info window
+
+-------------REMINDERS--------------------
+-Webgl context parameters. Event loop?
 
 
 -------------MAIN OUTLINE------------------

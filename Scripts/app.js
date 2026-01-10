@@ -33,6 +33,8 @@ function resize() {
     height = window.innerHeight;
     canvas.width = width;
     canvas.height = height;
+
+    gl.viewport(0, 0, width, height);
 }
 
 //#endregion

@@ -67,13 +67,23 @@ vertexFile, fragmentFile reference the fullname of a the file in /Shaders direct
 */
 async function programShaders(program, vertexFileURL, fragmentFileURL) {
 
-    vertexFile = await fetch(shaderURL + vertexFileURL);
+    try {
+        vertexFile = await fetch(shaderURL + vertexFileURL);
+    } catch (err) {
+        console.err(err, 'Could not fetch vertex shader source code from server.');
+    }
+    
     vertexShaderSource = await vertexFile.text();
     vertexShader = createShader(vertexShaderSource, 'vertex');
 
     gl.attachShader(program, vertexShader);
 
-    fragmentFile = await fetch(shaderURL + fragmentFileURL);
+    try {
+        fragmentFile = await fetch(shaderURL + fragmentFileURL);
+    } catch (err) {
+        console.err(err, 'Could not fetch fragment shader source code from server.');
+    }
+    
     fragmentShaderSource = await fragmentFile.text();
     fragmentShader = createShader(fragmentShaderSource, 'fragment');
 
