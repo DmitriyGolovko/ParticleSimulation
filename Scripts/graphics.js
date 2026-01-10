@@ -63,11 +63,14 @@ Attach vertex and fragment shader to existing program.
 Displays any errors with linking.
 vertexFile, fragmentFile reference the fullname of a the file in /Shaders directory
 */
-async function programShaders(program, vertexFile, fragmentFile) {
-    vertexShaderSource = await fetch(shaderURL + vertexFile);
+async function programShaders(program, vertexFileURL, fragmentFileURL) {
+
+    vertexFile = await fetch(shaderURL + vertexFileURL);
+    vertexShaderSource = await vertexFile.text();
     vertexShader = createShader(vertexShaderSource, 'vertex');
 
-    fragmentShaderSource = await fetch(shaderURL + fragmentFile);
+    fragmentFile = await fetch(shaderURL + fragmentFileURL);
+    fragmentShaderSource = await fragmentFile.text();
     fragmentShader = createShader(fragmentShaderSource, 'fragment');
 
     gl.attachShader(program, vertexShader);
@@ -87,8 +90,16 @@ async function initializeProgram() {
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
     //Attach shaders for 3d rendering and passthrough programs.
-    programShaders(renderProgram, '3d.vs', '3d.fs');
+    programShaders(renderProgram, 'vrender.vs', 'frender.fs');
     programShaders(passProgram, 'quad.vs', 'pass.fs');
+}
+
+/*
+Draw an individual frame.
+Complete with fragment shader post processing.
+*/
+function drawFrame() {
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 }
 
 //#endregion
