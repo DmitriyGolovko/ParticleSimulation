@@ -42,9 +42,11 @@ let passFragmentShader;
 Create and compile a shader based on type (vertex/fragment)
 */
 function createShader(shaderSource, shaderType) {
-    if (shaderType != 'vertex' || shaderType != 'fragment') {
+    if (shaderType != 'vertex' && shaderType != 'fragment') {
         throw new Error('Wrong shader type specified at shader creation.');
     }
+
+    shaderType = shaderType == 'vertex' ? gl.VERTEX_SHADER : gl.FRAGMENT_SHADER;
 
     let shader = gl.createShader(shaderType);
     gl.shaderSource(shader, shaderSource);
@@ -69,14 +71,16 @@ async function programShaders(program, vertexFileURL, fragmentFileURL) {
     vertexShaderSource = await vertexFile.text();
     vertexShader = createShader(vertexShaderSource, 'vertex');
 
+    gl.attachShader(program, vertexShader);
+
     fragmentFile = await fetch(shaderURL + fragmentFileURL);
     fragmentShaderSource = await fragmentFile.text();
     fragmentShader = createShader(fragmentShaderSource, 'fragment');
 
-    gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
 
     gl.linkProgram(program);
+    
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
         throw new Error(gl.getProgramInfoLog(program));
     }
@@ -86,7 +90,7 @@ async function programShaders(program, vertexFileURL, fragmentFileURL) {
 Initializes programs.
 Asynchronous to fetch shader source code from server.
 */
-async function initializeProgram() {
+async function initializePrograms() {
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
     //Attach shaders for 3d rendering and passthrough programs.
@@ -100,6 +104,19 @@ Complete with fragment shader post processing.
 */
 function drawFrame() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    //Temp triangle code.
+    gl.useProgram(renderProgram);
+
+    let buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-0.5, -0.5, 0.5, 0.0, 0.5, 0.5, 0.5, -0.5, 0.5]), gl.STATIC_DRAW);
+
+    let aPositionLoc = gl.getAttribLocation(renderProgram, "aPosition");
+    gl.vertexAttribPointer(aPositionLoc, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(aPositionLoc);
+
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
 
 //#endregion
