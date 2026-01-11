@@ -104,8 +104,8 @@ async function initializePrograms() {
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
     //Attach shaders for 3d rendering and passthrough programs.
-    programShaders(renderProgram, 'vrender.vs', 'frender.fs');
-    programShaders(passProgram, 'quad.vs', 'pass.fs');
+    await programShaders(renderProgram, 'vrender.vs', 'frender.fs');
+    await programShaders(passProgram, 'quad.vs', 'pass.fs');
 }
 
 /*
@@ -120,11 +120,17 @@ function drawFrame() {
 
     let buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-0.5, -0.5, 0.5, 0.0, 0.5, 0.5, 0.5, -0.5, 0.5]), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-0.5, -0.5, 0.5, 1.0, 0.6, 0.0,
+                                                      0.0,  0.5, 0.5, 0.5, 1.0, 0.5,
+                                                      0.5, -0.5, 0.5, 0.0, 0.7, 1.0]), gl.STATIC_DRAW);
 
     let aPositionLoc = gl.getAttribLocation(renderProgram, "aPosition");
-    gl.vertexAttribPointer(aPositionLoc, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(aPositionLoc, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 0);
     gl.enableVertexAttribArray(aPositionLoc);
+
+    let colorLoc = gl.getAttribLocation(renderProgram, 'color');
+    gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
+    gl.enableVertexAttribArray(colorLoc);
 
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
