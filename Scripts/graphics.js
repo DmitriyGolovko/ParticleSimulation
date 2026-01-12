@@ -122,8 +122,8 @@ function drawFrame() {
     const perspectiveMatrixLoc = gl.getUniformLocation(renderProgram, 'u_perspectiveTransformationMatrix');
     gl.uniformMatrix4fv(perspectiveMatrixLoc, false, createPerspectiveMatrix(width / height, Math.PI / 3, 1, 100));
 
-    const translationMatrixLoc = gl.getUniformLocation(renderProgram, 'u_perpectiveTransformationMatrix');
-    gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(0, 0, 5));
+    const translationMatrixLoc = gl.getUniformLocation(renderProgram, 'u_translationTransformationMatrix');
+    gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(1.5, 0, 3));
 
     let buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -157,8 +157,8 @@ function createPerspectiveMatrix(aspectRatio, fov, nearZ, farZ) {
 
     return new Float32Array([element0, 0,         0,         0, 
                              0,        element5,  0,         0, 
-                             0,        0,         element10, element11, 
-                             0,        0,         1,         0          ]);
+                             0,        0,         element10, 1, 
+                             0,        0,         element11, 0  ]);
 }
 
 /*
@@ -166,10 +166,10 @@ Create a translation matrix by x, y, z.
 Returns a Float32Array 1-D array object representing a 4x4 matrix.
 */
 function createTranslationMatrix(x, y, z) {
-    return new Float32Array([1, 0, 0, x,
-                             0, 1, 0, y,
-                             0, 0, 1, z,
-                             0, 0, 0, 1]);
+    return new Float32Array([1, 0, 0, 0,
+                             0, 1, 0, 0,
+                             0, 0, 1, 0,
+                             x, y, z, 1]);
 }
 
 //#endregion
