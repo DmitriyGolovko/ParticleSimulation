@@ -118,9 +118,16 @@ function drawFrame() {
     //Temp triangle code.
     gl.useProgram(renderProgram);
 
+
+    const perspectiveMatrixLoc = gl.getUniformLocation(renderProgram, 'u_perspectiveTransformationMatrix');
+    gl.uniformMatrix4fv(perspectiveMatrixLoc, false, createPerspectiveMatrix(width / height, Math.PI / 3, 1, 100));
+
+    const translationMatrixLoc = gl.getUniformLocation(renderProgram, 'u_perpectiveTransformationMatrix');
+    gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(0, 0, 5));
+
     let buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-0.5, -0.5, 0.5, 1.0, 0.6, 0.0,
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-0.5, -0.5, 0.5, 3 / 255, 252 / 255, 161/255,
                                                       0.0,  0.5, 0.5, 0.5, 1.0, 0.5,
                                                       0.5, -0.5, 0.5, 0.0, 0.7, 1.0]), gl.STATIC_DRAW);
 
@@ -133,6 +140,36 @@ function drawFrame() {
     gl.enableVertexAttribArray(colorLoc);
 
     gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+
+//#endregion
+
+//#region Tranformation Matrices
+
+/*
+Creates a perspective matrix and returns a Float32Array object of 16 elements representing a 4x4 matrix.
+*/
+function createPerspectiveMatrix(aspectRatio, fov, nearZ, farZ) {
+    let element0 = 1 / (aspectRatio * Math.tan(fov / 2));
+    let element5 = 1 / Math.tan(fov / 2);
+    let element10 = (-nearZ - farZ) / (nearZ - farZ);
+    let element11 = 2 * farZ * nearZ / (nearZ - farZ);
+
+    return new Float32Array([element0, 0,         0,         0, 
+                             0,        element5,  0,         0, 
+                             0,        0,         element10, element11, 
+                             0,        0,         1,         0          ]);
+}
+
+/*
+Create a translation matrix by x, y, z.
+Returns a Float32Array 1-D array object representing a 4x4 matrix.
+*/
+function createTranslationMatrix(x, y, z) {
+    return new Float32Array([1, 0, 0, x,
+                             0, 1, 0, y,
+                             0, 0, 1, z,
+                             0, 0, 0, 1]);
 }
 
 //#endregion
