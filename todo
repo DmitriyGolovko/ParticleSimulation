@@ -64,7 +64,8 @@ These steps could change depending on what is discovered during research.
 
 3. Implement basic 3D graphics for particles.
 -Create perspective and camera transformations for the vertex shader. DONE
--Get matrix transformations working for the triangle.
+-Get matrix transformations working for the triangle. DONE
+-Populate scene with particles.
 
 4. Plan implementation of physics equations - long term.
 

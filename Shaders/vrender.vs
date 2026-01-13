@@ -10,8 +10,6 @@ varying lowp vec3 vColor;
 
 void main() {
     gl_Position = u_perspectiveTransformationMatrix * u_translationTransformationMatrix * vec4(aPosition, 1.0);
-    //gl_Position = u_translationTransformationMatrix * vec4(aPosition, 1.0);
-    //gl_Position = vec4(aPosition, 1.0);
 
     vColor = color;
 }

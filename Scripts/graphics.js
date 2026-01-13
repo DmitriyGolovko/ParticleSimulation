@@ -2,6 +2,11 @@
 //#region WebGL Low End
 
 /*
+Custom variables for engine that can be adjusted.
+*/
+let FOV = Math.PI / 3 //60 degrees
+
+/*
 Getting canvas and webgl contexts.
 */
 const canvas = document.getElementById('graphics-canvas');
@@ -20,6 +25,19 @@ Website will use 2 programs:
 */
 let renderProgram = gl.createProgram();
 let passProgram = gl.createProgram();
+
+/*
+Attributes for renderProgram vertex shader.
+Gets created in initializePrograms function.
+*/
+let aPositionAttribute;
+let colorAttribute;
+
+/*
+Uniforms for the shaders, set in initializePrograms function.
+*/
+let perspectiveMatrixLoc;
+let translationMatrixLoc;
 
 /*
 Set of shaders for standard 3D rendering.
@@ -66,7 +84,6 @@ Displays any errors with linking.
 vertexFile, fragmentFile reference the fullname of a the file in /Shaders directory
 */
 async function programShaders(program, vertexFileURL, fragmentFileURL) {
-
     try {
         vertexFile = await fetch(shaderURL + vertexFileURL);
     } catch (err) {
@@ -106,6 +123,22 @@ async function initializePrograms() {
     //Attach shaders for 3d rendering and passthrough programs.
     await programShaders(renderProgram, 'vrender.vs', 'frender.fs');
     await programShaders(passProgram, 'quad.vs', 'pass.fs');
+
+    //Creating position attribute for vrender.vs
+    aPositionAttribute = gl.getAttribLocation(renderProgram, "aPosition");
+    gl.vertexAttribPointer(aPositionAttribute, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 0);
+    gl.enableVertexAttribArray(aPositionAttribute);
+
+    //Creating color attribute for vrender.vs
+    colorAttribute = gl.getAttribLocation(renderProgram, 'color');
+    gl.vertexAttribPointer(colorAttribute, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
+    gl.enableVertexAttribArray(colorAttribute);
+
+    //Setting location of perspective uniform.
+    perspectiveMatrixLoc = gl.getUniformLocation(renderProgram, 'u_perspectiveTransformationMatrix');
+
+    //Setting location of translation uniform.
+    translationMatrixLoc = gl.getUniformLocation(renderProgram, 'u_translationTransformationMatrix');
 }
 
 /*
@@ -118,26 +151,14 @@ function drawFrame() {
     //Temp triangle code.
     gl.useProgram(renderProgram);
 
-
-    const perspectiveMatrixLoc = gl.getUniformLocation(renderProgram, 'u_perspectiveTransformationMatrix');
-    gl.uniformMatrix4fv(perspectiveMatrixLoc, false, createPerspectiveMatrix(width / height, Math.PI / 3, 1, 100));
-
-    const translationMatrixLoc = gl.getUniformLocation(renderProgram, 'u_translationTransformationMatrix');
-    gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(1.5, 0, 3));
+    gl.uniformMatrix4fv(perspectiveMatrixLoc, false, createPerspectiveMatrix(width / height, FOV, 1, 100));
 
     let buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-0.5, -0.5, 0.5, 3 / 255, 252 / 255, 161/255,
                                                       0.0,  0.5, 0.5, 0.5, 1.0, 0.5,
                                                       0.5, -0.5, 0.5, 0.0, 0.7, 1.0]), gl.STATIC_DRAW);
-
-    let aPositionLoc = gl.getAttribLocation(renderProgram, "aPosition");
-    gl.vertexAttribPointer(aPositionLoc, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 0);
-    gl.enableVertexAttribArray(aPositionLoc);
-
-    let colorLoc = gl.getAttribLocation(renderProgram, 'color');
-    gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
-    gl.enableVertexAttribArray(colorLoc);
+    
 
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 }

@@ -17,3 +17,11 @@ pos (position) has x y z properties.
 vel (velocity) has x y z properties.
 */
 particleList = [];
+
+let time = 0;
+
+setInterval(() => {
+    time += 1 / 60;
+    gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(Math.cos(time), 0, 4 + Math.sin(2 *time)));
+    drawFrame();
+}, 1000 / 60);
