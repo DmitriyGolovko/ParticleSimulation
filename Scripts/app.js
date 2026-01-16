@@ -1,9 +1,6 @@
 //app.js handles the frontend of the application.
 //How UI interacts with user and communicating to the server.
 
-initializePrograms().then(drawFrame);
-
-
 //#region Global Parameters
 
 //Width and height of window. Set in resize() event.

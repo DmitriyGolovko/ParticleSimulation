@@ -120,9 +120,45 @@ Asynchronous to fetch shader source code from server.
 async function initializePrograms() {
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LEQUAL);
+
     //Attach shaders for 3d rendering and passthrough programs.
     await programShaders(renderProgram, 'vrender.vs', 'frender.fs');
     await programShaders(passProgram, 'quad.vs', 'pass.fs');
+
+    //Setting location of perspective uniform.
+    perspectiveMatrixLoc = gl.getUniformLocation(renderProgram, 'u_perspectiveTransformationMatrix');
+
+    //Setting location of translation uniform.
+    translationMatrixLoc = gl.getUniformLocation(renderProgram, 'u_translationTransformationMatrix');
+
+    
+}
+
+/*
+Draw an individual frame.
+Complete with fragment shader post processing.
+*/
+function drawFrame(vbo, ebo, length) {
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    gl.useProgram(renderProgram);
+
+    gl.uniformMatrix4fv(perspectiveMatrixLoc, false, createPerspectiveMatrix(width / height, FOV, 1, 100));
+
+    // let buffer = gl.createBuffer();
+    // gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-0.5, -0.5, 0.5, 3 / 255, 252 / 255, 161/255,
+    //                                                   0.0,  0.5, 0.5, 0.5, 1.0, 0.5,
+    //                                                   0.5, -0.5, 0.5, 0.0, 0.7, 1.0]), gl.STATIC_DRAW);
+
+    // let ebuffer = gl.createBuffer();
+    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebuffer);
+    // gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0, 1, 2]), gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
 
     //Creating position attribute for vrender.vs
     aPositionAttribute = gl.getAttribLocation(renderProgram, "aPosition");
@@ -134,33 +170,8 @@ async function initializePrograms() {
     gl.vertexAttribPointer(colorAttribute, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
     gl.enableVertexAttribArray(colorAttribute);
 
-    //Setting location of perspective uniform.
-    perspectiveMatrixLoc = gl.getUniformLocation(renderProgram, 'u_perspectiveTransformationMatrix');
-
-    //Setting location of translation uniform.
-    translationMatrixLoc = gl.getUniformLocation(renderProgram, 'u_translationTransformationMatrix');
-}
-
-/*
-Draw an individual frame.
-Complete with fragment shader post processing.
-*/
-function drawFrame() {
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    //Temp triangle code.
-    gl.useProgram(renderProgram);
-
-    gl.uniformMatrix4fv(perspectiveMatrixLoc, false, createPerspectiveMatrix(width / height, FOV, 1, 100));
-
-    let buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-0.5, -0.5, 0.5, 3 / 255, 252 / 255, 161/255,
-                                                      0.0,  0.5, 0.5, 0.5, 1.0, 0.5,
-                                                      0.5, -0.5, 0.5, 0.0, 0.7, 1.0]), gl.STATIC_DRAW);
-    
-
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.drawElements(gl.TRIANGLES, length, gl.UNSIGNED_SHORT, 0);
+    //gl.drawElements(gl.TRIANGLES, 3, gl.UNSIGNED_SHORT, 0);
 }
 
 //#endregion
