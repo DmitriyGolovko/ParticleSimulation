@@ -65,7 +65,8 @@ These steps could change depending on what is discovered during research.
 3. Implement basic 3D graphics for particles.
 -Create perspective and camera transformations for the vertex shader. DONE
 -Get matrix transformations working for the triangle. DONE
--Populate scene with particles.
+-Populate scene with particles. DONE
+-Create a camera.
 
 4. Plan implementation of physics equations - long term.
 
@@ -77,3 +78,6 @@ These steps could change depending on what is discovered during research.
 
 
 7. Simulate using delayed forces accounting for speed of light of information relay.
+
+
+

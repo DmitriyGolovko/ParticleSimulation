@@ -79,29 +79,30 @@ function createTetrahedronVA(pos, color) {
 particleList.push({ pos: { x: 0, y: 1, z: 70 }, color: { r: 1.0, g: 0.1, b: 0.3 } });
 // particleList.push({ pos: { x: 0, y: 6, z: 50 }, color: { r: 0.7, g: 0.5, b: 0.7 } });
 
-for (let i = 0; i < 500; i++) {
+for (let i = 0; i < 3000; i++) {
     particleList.push({ pos: {
-        x: Math.random() * 100 - 50,
-        y: Math.random() * 100 - 50,
-        z: Math.random() * 20 + 60
+        x: Math.random() * 50 - 25,
+        y: Math.random() * 50 - 25,
+        z: Math.random() * 10 - 5
     }, color: {
         r: Math.random(),
         g: Math.random(),
         b: Math.random()
-    }})
+    }});
 }
-
-
 
 let time = 0;
 
 initializePrograms().then(() => {
     updateParticlesBuffer();
+    
     setInterval(() => {
         time += 1 / 60;
-        //gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(Math.cos(time), 0, 10 + Math.sin(2 * time)));
-        gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(0, -10 * Math.sin(time), 10));
+        //gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(Math.cos(time), 0, 3 + Math.sin(2 * time)));
+        //gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(0, 0, 2));
+        updateCameraUniforms(40 * Math.cos(time / 2), 40 * Math.sin(time / 2), 20, 0.5, - Math.PI / 2 - time / 2);
+        //updateCameraUniforms(0, 0, 0, 0, 0);
         drawFrame(particlesVBO, particlesEBO, particleList.length * 12);
     }, 1000 / 60);
-})
+});
 
