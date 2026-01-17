@@ -1,11 +1,5 @@
 
 
----------------TASKS-------------
--Add error handling for programShaders. DONE
--Adjust opengl window on resize. DONE
-
-
-
 ----------------GOAL-----------------
 
 This is going to be another somewhat ambitious project.
@@ -66,7 +60,8 @@ These steps could change depending on what is discovered during research.
 -Create perspective and camera transformations for the vertex shader. DONE
 -Get matrix transformations working for the triangle. DONE
 -Populate scene with particles. DONE
--Create a camera.
+-Create a camera. DONE
+-Create a post processor.
 
 4. Plan implementation of physics equations - long term.
 

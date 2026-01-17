@@ -2,11 +2,6 @@
 //#region WebGL Low End
 
 /*
-Custom variables for engine that can be adjusted.
-*/
-let FOV = Math.PI / 3 //60 degrees
-
-/*
 Getting canvas and webgl contexts.
 */
 const canvas = document.getElementById('graphics-canvas');
@@ -14,7 +9,9 @@ const gl = canvas.getContext('webgl', {
     alpha: true
 });
 
-
+/*
+Shader URL base folder for fetching shaders.
+*/
 let shaderURL = `${window.location.href}/Shaders/`;
 
 
@@ -34,9 +31,16 @@ let aPositionAttribute;
 let colorAttribute;
 
 /*
-Uniforms for the shaders, set in initializePrograms function.
+Perspective matrix parameters and location in renderProgram.
 */
 let perspectiveMatrixLoc;
+let FOV = Math.PI / 3 //60 degrees
+let zNear = 1;
+let zFar = 10000;
+
+/*
+Uniforms for the renderProgram vertex shader, set in initializePrograms function.
+*/
 let translationMatrixLoc;
 let xRotationMatrixLoc;
 let zRotationMatrixLoc;
@@ -83,7 +87,7 @@ function createShader(shaderSource, shaderType) {
 /*
 Attach vertex and fragment shader to existing program.
 Displays any errors with linking.
-vertexFile, fragmentFile reference the fullname of a the file in /Shaders directory
+vertexFile, fragmentFile reference the fullname of the file in /Shaders directory.
 */
 async function programShaders(program, vertexFileURL, fragmentFileURL) {
     try {
@@ -120,14 +124,20 @@ Initializes programs.
 Asynchronous to fetch shader source code from server.
 */
 async function initializePrograms() {
+    //Color that will be set when calling gl.clear.
     gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
+    //Stops triangle meshes from overlapping when behind another triangle from the camera.
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LEQUAL);
 
     //Attach shaders for 3d rendering and passthrough programs.
     await programShaders(renderProgram, 'vrender.vs', 'frender.fs');
     await programShaders(passProgram, 'quad.vs', 'pass.fs');
+
+    /*
+    Render program uniforms and attributes setup.
+    */
 
     gl.useProgram(renderProgram);
 
@@ -148,26 +158,13 @@ async function initializePrograms() {
     gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(0, 0, 0));
     gl.uniformMatrix4fv(xRotationMatrixLoc, false, createXRotationMatrix(0));
     gl.uniformMatrix4fv(zRotationMatrixLoc, false, createZRotationMatrix(0));
-}
 
-/*
-Draw an individual frame.
-Complete with fragment shader post processing.
-*/
-function drawFrame(vbo, ebo, elementsLength) {
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    //Setting perspective matrix, this should not change.
+    gl.uniformMatrix4fv(perspectiveMatrixLoc, false, createPerspectiveMatrix(width / height, FOV, zNear, zFar));
 
-    gl.useProgram(renderProgram);
-
-    gl.uniformMatrix4fv(perspectiveMatrixLoc, false, createPerspectiveMatrix(width / height, FOV, 1, 10000));
-
-    // const viewZUp = new Float32Array([
-    //     1, 0, 0, 0,
-    //     0, 0, -1, 0,
-    //     0, 1, 0, 0,
-    //     0, 0, 0, 1
-    // ]);
-
+    //This is 4x4 matrix will swap the y and z coordinates in the vertex shader.
+    //Such that X crossproduct Y results in Z.
+    //positive-z is up and positive-y is inward towards the screen at the default camera position.
     const viewZUp = new Float32Array([
         1, 0, 0, 0,
         0, 0, 1, 0,
@@ -176,15 +173,20 @@ function drawFrame(vbo, ebo, elementsLength) {
     ]);
     gl.uniformMatrix4fv(viewZUpLoc, false, viewZUp);
 
-    // let buffer = gl.createBuffer();
-    // gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-0.5, -0.5, 0.5, 3 / 255, 252 / 255, 161/255,
-    //                                                   0.0,  0.5, 0.5, 0.5, 1.0, 0.5,
-    //                                                   0.5, -0.5, 0.5, 0.0, 0.7, 1.0]), gl.STATIC_DRAW);
+    /*
+    Pass program uniforms and attributes setup.
+    */
+}
 
-    // let ebuffer = gl.createBuffer();
-    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebuffer);
-    // gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array([0, 1, 2]), gl.STATIC_DRAW);
+/*
+Draw an individual frame.
+Complete with fragment shader post processing.
+initializePrograms() needs to be called first before calling this function.
+*/
+function drawFrame(vbo, ebo, elementsLength) {
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    gl.useProgram(renderProgram);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
@@ -200,7 +202,6 @@ function drawFrame(vbo, ebo, elementsLength) {
     gl.enableVertexAttribArray(colorAttribute);
 
     gl.drawElements(gl.TRIANGLES, elementsLength, gl.UNSIGNED_SHORT, 0);
-    //gl.drawElements(gl.TRIANGLES, 3, gl.UNSIGNED_SHORT, 0);
 }
 
 //#endregion
@@ -239,6 +240,9 @@ function createPerspectiveMatrix(aspectRatio, fov, nearZ, farZ) {
         0, 0, element11, 0]);
 }
 
+/*
+Creates a rotation matrix around the x-axis.
+*/
 function createXRotationMatrix(angle) {
     return new Float32Array([
         1, 0, 0, 0,
@@ -248,6 +252,9 @@ function createXRotationMatrix(angle) {
     ]);
 }
 
+/*
+Creates a rotation matrix around the z-axis.
+*/
 function createZRotationMatrix(angle) {
     return new Float32Array([
         Math.cos(angle), Math.sin(angle), 0, 0,
