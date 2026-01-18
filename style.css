@@ -50,7 +50,7 @@ body {
 
 .button {
     width: 25px;
-    background-color: red;
+    background-color: rgb(156, 156, 156);
 }
 
 .button:hover {
@@ -59,7 +59,7 @@ body {
 
 .slider {
     width: 150px;
-    background-color: red;
+    background-color: rgb(153, 153, 153);
 }
 
 input[type="range"]:hover {

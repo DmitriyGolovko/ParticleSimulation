@@ -236,7 +236,7 @@ Draw an individual frame.
 Complete with fragment shader post processing.
 initializePrograms() needs to be called first before calling this function.
 */
-function drawFrame(vbo, ebo, elementsLength, time) {
+function drawFrame(vbo, ebo, elementsLength, width, height, time) {
     //Clearing canvas.
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -244,6 +244,7 @@ function drawFrame(vbo, ebo, elementsLength, time) {
     Render program step.
     */
     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+    gl.viewport(0, 0, width, height);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureBuffer, 0);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
 
@@ -274,6 +275,7 @@ function drawFrame(vbo, ebo, elementsLength, time) {
 
     //Binding to null draws to canvas.
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, width, height);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, textureBuffer);
 
@@ -292,7 +294,8 @@ function drawFrame(vbo, ebo, elementsLength, time) {
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-
+    
+    //Sets to renderProgram so that uniforms for camera may be set inbetween draw calls.
     gl.useProgram(renderProgram);
 }
 

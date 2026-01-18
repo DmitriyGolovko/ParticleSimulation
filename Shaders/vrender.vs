@@ -5,7 +5,7 @@ attribute vec3 a_color;
 
 uniform mat4 u_perspectiveMatrix;
 uniform mat4 u_translationMatrix;
-uniform mat4 u_viewZUp; //This matrix orientates the axii's properly.
+uniform mat4 u_viewZUp; //This matrix orientates the axiis properly.
 uniform mat4 u_xRotationMatrix;
 uniform mat4 u_zRotationMatrix;
 
