@@ -61,6 +61,12 @@ Will be drawn to the screen.
 let quadVertexShader
 let passFragmentShader;
 
+/*
+Buffer objects for pass program.
+*/
+let quadBuffer; //VBO that contains basic rectangle.
+let textureBuffer; //Texture buffer to render scene to.
+let frameBuffer; //Frame buffer object.
 
 /*
 Create and compile a shader based on type (vertex/fragment)
@@ -135,6 +141,8 @@ async function initializePrograms() {
     await programShaders(renderProgram, 'vrender.vs', 'frender.fs');
     await programShaders(passProgram, 'quad.vs', 'pass.fs');
 
+
+
     /*
     Render program uniforms and attributes setup.
     */
@@ -171,11 +179,36 @@ async function initializePrograms() {
         0, 1, 0, 0,
         0, 0, 0, 1
     ]);
+
     gl.uniformMatrix4fv(viewZUpLoc, false, viewZUp);
+
+
 
     /*
     Pass program uniforms and attributes setup.
     */
+
+    //Rectangle for quad.vs shader.
+    quadBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(
+        [//   position       UV
+            -1.0, -1.0,   0.0, 0.0,
+             1.0, -1.0,   1.0, 0.0,
+             1.0,  1.0,   1.0, 1.0,
+            -1.0, -1.0,   0.0, 0.0,
+             1.0,  1.0,   1.0, 1.0,
+            -1.0,  1.0,   0.0, 1.0
+        ]), gl.STATIC_DRAW);
+
+    textureBuffer = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, textureBuffer);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+    frameBuffer = gl.createFramebuffer();
 }
 
 /*
@@ -183,25 +216,58 @@ Draw an individual frame.
 Complete with fragment shader post processing.
 initializePrograms() needs to be called first before calling this function.
 */
-function drawFrame(vbo, ebo, elementsLength) {
+function drawFrame(vbo, ebo, elementsLength, time) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    gl.useProgram(renderProgram);
+    /*
+    Render program step.
+    */
+    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureBuffer, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ebo);
 
     //Creating position attribute for vrender.vs
-    aPositionAttribute = gl.getAttribLocation(renderProgram, "aPosition");
+    aPositionAttribute = gl.getAttribLocation(renderProgram, "a_position");
     gl.vertexAttribPointer(aPositionAttribute, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 0);
     gl.enableVertexAttribArray(aPositionAttribute);
 
     //Creating color attribute for vrender.vs
-    colorAttribute = gl.getAttribLocation(renderProgram, 'color');
+    colorAttribute = gl.getAttribLocation(renderProgram, 'a_color');
     gl.vertexAttribPointer(colorAttribute, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
     gl.enableVertexAttribArray(colorAttribute);
 
     gl.drawElements(gl.TRIANGLES, elementsLength, gl.UNSIGNED_SHORT, 0);
+
+
+
+    /*
+    Pass program step.
+    */
+    gl.useProgram(passProgram);
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, textureBuffer);
+
+    let timeLoc = gl.getUniformLocation(passProgram, 'time');
+    gl.uniform1f(timeLoc, time);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
+    aQuadPositionAttribute = gl.getAttribLocation(passProgram, 'a_position');
+    gl.vertexAttribPointer(aQuadPositionAttribute, 2, gl.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 0);
+    gl.enableVertexAttribArray(aQuadPositionAttribute);
+
+    const aQuadUVAttribute = gl.getAttribLocation(passProgram, "a_texCoord");
+    gl.vertexAttribPointer(aQuadUVAttribute, 2, gl.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT);
+    gl.enableVertexAttribArray(aQuadUVAttribute);
+
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+
+    gl.useProgram(renderProgram);
 }
 
 //#endregion
@@ -218,7 +284,7 @@ function updateCameraUniforms(cameraX, cameraY, cameraZ, xAngle, zAngle) {
     gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(-cameraX, -cameraY, -cameraZ));
     gl.uniformMatrix4fv(xRotationMatrixLoc, false, createXRotationMatrix(xAngle));
     gl.uniformMatrix4fv(zRotationMatrixLoc, false, createZRotationMatrix(zAngle));
-}   
+}
 
 //#endregion
 
