@@ -98,9 +98,8 @@ for (let i = 0; i < 3000; i++) {
 
 let time = 0;
 
-initializePrograms().then(() => {
+initializePrograms().then(() => {    
     updateParticlesBuffer();
-    
     setInterval(() => {
         time += 1 / 60;
         //gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(Math.cos(time), 0, 3 + Math.sin(2 * time)));

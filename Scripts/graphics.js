@@ -72,6 +72,7 @@ Buffer objects for pass program.
 let quadBuffer; //VBO that contains basic rectangle.
 let textureBuffer; //Texture buffer to render scene to.
 let frameBuffer; //Frame buffer object.
+let depthBuffer;
 
 /*
 Create and compile a shader based on type (vertex/fragment)
@@ -193,21 +194,21 @@ async function initializePrograms() {
     Pass program uniforms and attributes setup.
     */
 
-    timeLoc = gl.getUniformLocation(passProgram, 'time');
+    timeLoc = gl.getUniformLocation(passProgram, 'u_time');
 
     //Rectangle for quad.vs shader.
     quadBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(
         [//   position       UV
-            -1.0, -1.0,   0.0, 0.0,
-             1.0, -1.0,   1.0, 0.0,
-             1.0,  1.0,   1.0, 1.0,
-            -1.0, -1.0,   0.0, 0.0,
-             1.0,  1.0,   1.0, 1.0,
-            -1.0,  1.0,   0.0, 1.0
+            -1.0, -1.0, 0.0, 0.0,
+            1.0, -1.0, 1.0, 0.0,
+            1.0, 1.0, 1.0, 1.0,
+            -1.0, -1.0, 0.0, 0.0,
+            1.0, 1.0, 1.0, 1.0,
+            -1.0, 1.0, 0.0, 1.0
         ]), gl.STATIC_DRAW);
-    
+
     /*
     Creating texture and assigning paramters.
     */
@@ -217,11 +218,17 @@ async function initializePrograms() {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    
+
     /*
     Frame buffer object that will be drawn to by renderProgram.
     */
     frameBuffer = gl.createFramebuffer();
+
+
+    depthBuffer = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
+
 }
 
 /*
@@ -238,6 +245,7 @@ function drawFrame(vbo, ebo, elementsLength, time) {
     */
     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureBuffer, 0);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
 
     //Clearing framebuffer.
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -281,7 +289,7 @@ function drawFrame(vbo, ebo, elementsLength, time) {
     const aQuadUVAttribute = gl.getAttribLocation(passProgram, "a_texCoord");
     gl.vertexAttribPointer(aQuadUVAttribute, 2, gl.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT);
     gl.enableVertexAttribArray(aQuadUVAttribute);
-    
+
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
 

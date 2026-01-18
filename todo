@@ -61,7 +61,8 @@ These steps could change depending on what is discovered during research.
 -Get matrix transformations working for the triangle. DONE
 -Populate scene with particles. DONE
 -Create a camera. DONE
--Create a post processor.
+-Create a post processor. DONE
+-Create a NEON post processing effect.
 
 4. Plan implementation of physics equations - long term.
 
