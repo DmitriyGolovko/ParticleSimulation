@@ -46,6 +46,11 @@ let xRotationMatrixLoc;
 let zRotationMatrixLoc;
 
 /*
+Uniforms for pass program.
+*/
+let timeLoc;
+
+/*
 Set of shaders for standard 3D rendering.
 Will draw to framebuffer object.
 */
@@ -188,6 +193,8 @@ async function initializePrograms() {
     Pass program uniforms and attributes setup.
     */
 
+    timeLoc = gl.getUniformLocation(passProgram, 'time');
+
     //Rectangle for quad.vs shader.
     quadBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
@@ -200,14 +207,20 @@ async function initializePrograms() {
              1.0,  1.0,   1.0, 1.0,
             -1.0,  1.0,   0.0, 1.0
         ]), gl.STATIC_DRAW);
-
+    
+    /*
+    Creating texture and assigning paramters.
+    */
     textureBuffer = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, textureBuffer);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-
+    
+    /*
+    Frame buffer object that will be drawn to by renderProgram.
+    */
     frameBuffer = gl.createFramebuffer();
 }
 
@@ -217,6 +230,7 @@ Complete with fragment shader post processing.
 initializePrograms() needs to be called first before calling this function.
 */
 function drawFrame(vbo, ebo, elementsLength, time) {
+    //Clearing canvas.
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     /*
@@ -224,6 +238,8 @@ function drawFrame(vbo, ebo, elementsLength, time) {
     */
     gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureBuffer, 0);
+
+    //Clearing framebuffer.
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
@@ -248,13 +264,15 @@ function drawFrame(vbo, ebo, elementsLength, time) {
     */
     gl.useProgram(passProgram);
 
+    //Binding to null draws to canvas.
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, textureBuffer);
 
-    let timeLoc = gl.getUniformLocation(passProgram, 'time');
+    //Setting time uniform with time parameter.
     gl.uniform1f(timeLoc, time);
 
+    //Setting quad attributes.
     gl.bindBuffer(gl.ARRAY_BUFFER, quadBuffer);
     aQuadPositionAttribute = gl.getAttribLocation(passProgram, 'a_position');
     gl.vertexAttribPointer(aQuadPositionAttribute, 2, gl.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 0);
@@ -263,7 +281,7 @@ function drawFrame(vbo, ebo, elementsLength, time) {
     const aQuadUVAttribute = gl.getAttribLocation(passProgram, "a_texCoord");
     gl.vertexAttribPointer(aQuadUVAttribute, 2, gl.FLOAT, false, 4 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT);
     gl.enableVertexAttribArray(aQuadUVAttribute);
-
+    
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
 
