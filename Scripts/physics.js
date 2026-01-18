@@ -74,10 +74,10 @@ function createTetrahedronVA(pos, color) {
     return va;
 }
 
-let G = 1;
+let G = 10;
 
-let spread = 500;
-let dist = 400;
+let spread = 200;
+let dist = 300;
 let h = 100;
 let xangle = 0.3;
 let delta = 1 / 30;
@@ -86,7 +86,7 @@ for (let i = 0; i < 1000; i++) {
     particleList.push({ pos: {
         x: Math.random() * spread - spread / 2,
         y: Math.random() * spread - spread / 2,
-        z: Math.random() * 10 - 5
+        z: Math.random() * spread - spread / 2
     }, color: {
         r: Math.random(),
         g: Math.random(),
@@ -97,12 +97,16 @@ for (let i = 0; i < 1000; i++) {
         z: 0
     }});
 
-    particleList[i].vel.x = -50 * particleList[i].pos.y / Math.sqrt(particleList[i].pos.x**2 + particleList[i].pos.y**2);
-    particleList[i].vel.y = 50 * particleList[i].pos.x / Math.sqrt(particleList[i].pos.x**2 + particleList[i].pos.y**2);
+    particleList[i].vel.x = -1 * particleList[i].pos.y / Math.sqrt(particleList[i].pos.x**2 + particleList[i].pos.y**2);
+    particleList[i].vel.y = 1 * particleList[i].pos.x / Math.sqrt(particleList[i].pos.x**2 + particleList[i].pos.y**2);
 }
 
-function magnitude(pos1, pos2) {
-    return Math.sqrt((pos1.x - pos2.x)**2 + (pos1.y - pos2.y)**2 + (pos1.z - pos2.z)**2);
+function magnitude32(pos1, pos2) {
+    return Math.pow((pos1.x - pos2.x)**2 + (pos1.y - pos2.y)**2 + (pos1.z - pos2.z)**2, 3 / 2);
+}
+
+function magnitude2(pos1, pos2) {
+    return (pos1.x - pos2.x)**2 + (pos1.y - pos2.y)**2 + (pos1.z - pos2.z)**2
 }
 
 function updateParticlePositions() {
@@ -111,11 +115,16 @@ function updateParticlePositions() {
 
         for (let p2 of particleList) {
             if (p1 === p2) continue;
-            if (magnitude(p1.pos, p2.pos) < 1.0) continue;
+
+            mag2 = magnitude2(p1.pos, p2.pos)
+
+            if (mag2 < 1.0 || mag2 > 500.0) continue;
+
+            let mag = magnitude32(p2.pos, p1.pos);
             
-            a.x += G * (p2.pos.x - p1.pos.x) / Math.pow(magnitude(p2.pos, p1.pos), 1.5);
-            a.y += G * (p2.pos.y - p1.pos.y) / Math.pow(magnitude(p2.pos, p1.pos), 1.5);
-            a.z += G * (p2.pos.z - p1.pos.z) / Math.pow(magnitude(p2.pos, p1.pos), 1.5);
+            a.x += G * (p2.pos.x - p1.pos.x) / mag;
+            a.y += G * (p2.pos.y - p1.pos.y) / mag;
+            a.z += G * (p2.pos.z - p1.pos.z) / mag;
 
             
         }
@@ -127,6 +136,41 @@ function updateParticlePositions() {
         p1.vel.x += delta * a.x;
         p1.vel.y += delta * a.y;
         p1.vel.z += delta * a.z;
+    }
+}
+
+function updateParticlePositionsOptimized() {
+    for(let i = 0; i < particleList.length; i++) {
+        let a = { x: 0, y: 0, z: 0 };
+        let p1 = particleList[i];
+
+        for (let j = i + 1; j < particleList.length; j++) {
+            let p2 = particleList[j];
+
+            mag2 = magnitude2(p1.pos, p2.pos)
+
+            if (mag2 < 1.0 || mag2 > 500.0) continue;
+
+            let mag = magnitude32(p2.pos, p1.pos);
+            
+            a.x += G * (p2.pos.x - p1.pos.x) / mag;
+            a.y += G * (p2.pos.y - p1.pos.y) / mag;
+            a.z += G * (p2.pos.z - p1.pos.z) / mag;
+
+            p1.vel.x += delta * a.x;
+            p1.vel.y += delta * a.y;
+            p1.vel.z += delta * a.z;
+
+            p2.vel.x -= delta * a.x;
+            p2.vel.y -= delta * a.y;
+            p2.vel.z -= delta * a.z;   
+        }
+    }
+
+    for (let p of particleList) {
+        p.pos.x += delta * p.vel.x;
+        p.pos.y += delta * p.vel.y;
+        p.pos.z += delta * p.vel.z;
     }
 }
 

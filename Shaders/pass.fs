@@ -10,7 +10,7 @@ void main() {
     //CRT TV effect
     float value = clamp(0.955 + sin(4000.0 * uv.y + u_time), 0.0, 1.0);
 
-    float dist = 0.003;
+    float dist = 0.002;
 
     vec4 left = texture2D(u_image, vec2(uv.x - dist, uv.y));
     vec4 up = texture2D(u_image, vec2(uv.x, uv.y + dist));
