@@ -74,17 +74,15 @@ function createTetrahedronVA(pos, color) {
     return va;
 }
 
-
-
-particleList.push({ pos: { x: 0, y: 1, z: 70 }, color: { r: 1.0, g: 0.1, b: 0.3 } });
-// particleList.push({ pos: { x: 0, y: 6, z: 50 }, color: { r: 0.7, g: 0.5, b: 0.7 } });
+let G = 1;
 
 let spread = 500;
 let dist = 400;
-let h = 50;
-let xangle = 0.2;
+let h = 100;
+let xangle = 0.3;
+let delta = 1 / 30;
 
-for (let i = 0; i < 3000; i++) {
+for (let i = 0; i < 1000; i++) {
     particleList.push({ pos: {
         x: Math.random() * spread - spread / 2,
         y: Math.random() * spread - spread / 2,
@@ -93,20 +91,57 @@ for (let i = 0; i < 3000; i++) {
         r: Math.random(),
         g: Math.random(),
         b: Math.random()
+    }, vel: {
+        x: 0,
+        y: 0,
+        z: 0
     }});
+
+    particleList[i].vel.x = -50 * particleList[i].pos.y / Math.sqrt(particleList[i].pos.x**2 + particleList[i].pos.y**2);
+    particleList[i].vel.y = 50 * particleList[i].pos.x / Math.sqrt(particleList[i].pos.x**2 + particleList[i].pos.y**2);
+}
+
+function magnitude(pos1, pos2) {
+    return Math.sqrt((pos1.x - pos2.x)**2 + (pos1.y - pos2.y)**2 + (pos1.z - pos2.z)**2);
+}
+
+function updateParticlePositions() {
+    for(let p1 of particleList) {
+        let a = { x: 0, y: 0, z: 0 };
+
+        for (let p2 of particleList) {
+            if (p1 === p2) continue;
+            if (magnitude(p1.pos, p2.pos) < 1.0) continue;
+            
+            a.x += G * (p2.pos.x - p1.pos.x) / Math.pow(magnitude(p2.pos, p1.pos), 1.5);
+            a.y += G * (p2.pos.y - p1.pos.y) / Math.pow(magnitude(p2.pos, p1.pos), 1.5);
+            a.z += G * (p2.pos.z - p1.pos.z) / Math.pow(magnitude(p2.pos, p1.pos), 1.5);
+
+            
+        }
+
+        p1.pos.x += delta * p1.vel.x;
+        p1.pos.y += delta * p1.vel.y;
+        p1.pos.z += delta * p1.vel.z;
+
+        p1.vel.x += delta * a.x;
+        p1.vel.y += delta * a.y;
+        p1.vel.z += delta * a.z;
+    }
 }
 
 let time = 0;
 
 initializePrograms().then(() => {    
-    updateParticlesBuffer();
     setInterval(() => {
-        time += 1 / 60;
-        //gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(Math.cos(time), 0, 3 + Math.sin(2 * time)));
-        //gl.uniformMatrix4fv(translationMatrixLoc, false, createTranslationMatrix(0, 0, 2));
-        updateCameraUniforms(dist * Math.cos(time / 4), dist * Math.sin(time / 4), h, xangle, - Math.PI / 2 - time / 4);
-        //updateCameraUniforms(0, 0, 0, 0, 0);
+        time += 1 / 30;
+        updateParticlePositions();
+        updateParticlesBuffer();
+
+        //updateCameraUniforms(dist * Math.cos(time / 4), dist * Math.sin(time / 4), h, xangle, - Math.PI / 2 - time / 4);
+        updateCameraUniforms(dist, 0, h, xangle, -Math.PI / 2);
+
         drawFrame(particlesVBO, particlesEBO, particleList.length * 12, width, height, time);
-    }, 1000 / 60);
+    }, 1000 / 30);
 });
 
